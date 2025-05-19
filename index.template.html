@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burographic - Interventions</title>
+    <link rel="icon" href="icone.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Francy';
+            src: url('fonts/Francy.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --rose: #E6007D;
+            --orange: #F39200;
+            --bleu: #32B7BC;
+            --gris: #EDEDED;
+            --noir: #000000;
+            --blanc: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Urbanist', sans-serif;
+            background-color: var(--blanc);
+            color: var(--noir);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+
+        .header {
+            background-color: var(--blanc);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            height: 50px;
+        }
+
+        .contact-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .phone {
+            color: var(--noir);
+            font-weight: 600;
+            margin-left: 15px;
+        }
+
+        .assistance-btn {
+            background-color: var(--bleu);
+            color: var(--blanc);
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            margin-right: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .assistance-btn svg {
+            margin-left: 8px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-family: 'Francy', sans-serif;
+            color: var(--noir);
+            position: relative;
+            font-weight: 300;
+            margin: 0;
+        }
+
+        .update-all-btn {
+            background-color: var(--orange);
+            color: var(--blanc);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-family: 'Urbanist', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .update-all-btn:hover {
+            background-color: #e07e00;
+            scale: 105%;
+            transition: all;
+            transition-duration: 0.2s;
+        }
+
+        .update-all-btn svg {
+            margin-right: 8px;
+        }
+
+        .subtitle {
+            color: var(--bleu);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: var(--blanc);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .card-header {
+            background-color: var(--rose);
+            color: var(--blanc);
+            padding: 15px 20px;
+            font-family: 'Francy', sans-serif;
+            font-size: 1.3rem;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        thead {
+            background-color: var(--gris);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--noir);
+            border-bottom: 2px solid var(--bleu);
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--gris);
+        }
+
+        tr:hover {
+            background-color: rgba(50, 183, 188, 0.05);
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: var(--rose);
+            font-weight: 500;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: rgba(50, 183, 188, 0.1);
+            border-left: 4px solid var(--bleu);
+            color: var(--bleu);
+        }
+
+        .alert-error {
+            background-color: rgba(230, 0, 125, 0.1);
+            border-left: 4px solid var(--rose);
+            color: var(--rose);
+        }
+
+        .footer {
+            background-color: var(--gris);
+            padding: 20px 40px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--noir);
+            margin-top: 40px;
+        }
+
+        .gradient-decorator {
+            height: 8px;
+            background: linear-gradient(to right, var(--rose), var(--orange), var(--bleu));
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                padding: 15px;
+            }
+
+            .contact-info {
+                margin-top: 15px;
+            }
+
+            .container {
+                padding: 0 15px;
+                margin: 20px auto;
+            }
+
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .card-header {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <img src="logo.jpg" alt="Burographic Logo" class="logo">
+</header>
+
+<main class="container">
+    <div class="header-container">
+        <div>
+            <h1>Liste des interventions qui n'ont pas été rentrées en stock</h1>
+            <p>{{nb_bi}} interventions n'ont pas mis à jour le stock</p>
+        </div>
+        <form action="maj.php" method="post">
+            <button type="submit" class="update-all-btn" name="update_all" value="1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21q-1.875 0-3.512-.712t-2.85-1.925t-1.925-2.85T3 12t.713-3.512t1.924-2.85t2.85-1.925T12 3q2.05 0 3.888.875T19 6.35V5q0-.425.288-.712T20 4t.713.288T21 5v4q0 .425-.288.713T20 10h-4q-.425 0-.712-.288T15 9t.288-.712T16 8h1.75q-1.025-1.4-2.525-2.2T12 5Q9.075 5 7.038 7.038T5 12t2.038 4.963T12 19q2.375 0 4.25-1.425t2.475-3.675q.125-.4.45-.6t.725-.15q.425.05.675.362t.15.688q-.725 2.975-3.15 4.888T12 21m1-9.4l2.5 2.5q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-2.8-2.8q-.15-.15-.225-.337T11 11.975V8q0-.425.288-.712T12 7t.713.288T13 8z"/></svg>
+                Tout mettre à jour
+            </button>
+        </form>
+    </div>
+
+    {{success}}
+
+    <div class="card">
+        <div class="card-header">Détail des interventions</div>
+        <div class="card-body">
+            {{interventions}}
+        </div>
+    </div>
+</main>
+</body>
+</html>
