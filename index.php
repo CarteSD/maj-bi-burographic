@@ -62,15 +62,29 @@ $template = str_replace('{{interventions}}', $html, $template);
 session_start();
 
 if (isset($_SESSION['success_message'])) {
-    $template = str_replace(
-        '{{success}}',
-        '<div class="alert alert-success">
-            <i class="fa fa-check-circle"></i>
-            <span>Mise à jour réussie !</span>
-        </div>',
-        $template
-    );
+    if ($_SESSION['success_message'] === true) {
+        $template = str_replace(
+            '{{success}}',
+            '<div class="alert alert-success">
+                <i class="fa fa-check-circle"></i>
+                <span>' . (isset($_SESSION['message_details']) ? htmlspecialchars($_SESSION['message_details']) : 'Mise à jour réussie !') . '</span>
+            </div>',
+            $template
+        );
+    } else {
+        $template = str_replace(
+            '{{success}}',
+            '<div class="alert alert-error">
+                <i class="fa fa-exclamation-triangle"></i>
+                <span>' . (isset($_SESSION['message_details']) ? htmlspecialchars($_SESSION['message_details']) : 'Erreur lors de la mise à jour.') . '</span>
+            </div>',
+            $template
+        );
+    }
     unset($_SESSION['success_message']);
+    if (isset($_SESSION['message_details'])) {
+        unset($_SESSION['message_details']);
+    }
 } else {
     $template = str_replace('{{success}}', '', $template);
 }
