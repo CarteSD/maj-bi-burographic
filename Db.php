@@ -1,5 +1,19 @@
 <?php
+/**
+ * @file     Db.php
+ * @author   Estéban DESESSARD
+ * @brief    Fichier de déclaration et définition de la classe Db
+ * @details
+ * @date     15/05/2025
+ * @version  0.0
+ */
 
+
+/**
+ * @brief Classe Db
+ * @details Cette classe gère les connexions aux deux bases de données
+ * et l'exécution des requêtes.
+ */
 class Db
 {
     private static array $instance = [];

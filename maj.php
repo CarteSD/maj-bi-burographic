@@ -2,12 +2,13 @@
 /**
  * @file     maj.php
  * @author   Estéban DESESSARD
- * @brief
+ * @brief    Fichier de mise à jour des interventions
  * @details
  * @date     15/05/2025
  * @version  0.0
  */
 
+ 
 require_once 'Db.php';
 
 // Vérifier si la demande vient du formulaire

@@ -1,4 +1,14 @@
 <?php
+/**
+ * @file     index.php
+ * @author   Estéban DESESSARD
+ * @brief    Fichier principal pour afficher les interventions à mettre à jour
+ * @details
+ * @date     15/05/2025
+ * @version  0.0
+ */
+
+
 require_once 'Db.php';
 
 $template = file_get_contents('index.template.html');
