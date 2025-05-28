@@ -375,4 +375,10 @@
             checkbox.addEventListener('change', updateIgnoreButtonState);
         });
     });
+
+    function selectCheckbox(e) {
+        let checkbox = e.querySelectorAll('.line-checkbox')[0];
+        checkbox.checked = !checkbox.checked;
+        updateIgnoreButtonState();
+    }
 </script>
