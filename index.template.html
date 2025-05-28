@@ -246,6 +246,32 @@
             margin-right: 8px;
         }
 
+        .select-all-btn {
+            background-color: var(--bleu);
+            color: var(--blanc);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-family: 'Urbanist', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .select-all-btn:hover {
+            background-color: #29989c;
+            scale: 105%;
+            transition: all;
+            transition-duration: 0.2s;
+        }
+
+        .select-all-btn svg {
+            margin-right: 8px;
+        }
+
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -297,3 +323,12 @@
 </main>
 </body>
 </html>
+
+<script>
+    function selectAllLines() {
+        const checkboxes = document.querySelectorAll('.line-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = true;
+        });
+    }
+</script>
