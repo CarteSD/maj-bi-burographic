@@ -36,7 +36,7 @@ try {
         $qte = $args[3] ?? 0;
 
         // Insérer dans la table HistoMaj
-        $dbInterventions->query("INSERT INTO HistoMaj (CodeDoc, NumLig, CodeElem, Qte, Ignore, DateMaj) VALUES (:codeDoc, :numLig, :codeElem, :qte, 1, GETDATE())", [
+        $dbInterventions->query("INSERT INTO HistoMaj VALUES (:codeDoc, :numLig, :codeElem, :qte, 1, GETDATE())", [
             'codeDoc' => $codeDoc,
             'numLig' => $numLig,
             'codeElem' => $codeElem,
