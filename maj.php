@@ -8,7 +8,7 @@
  * @version  0.0
  */
 
- 
+
 require_once 'Db.php';
 
 // Vérifier si la demande vient du formulaire
@@ -69,7 +69,7 @@ try {
             'codeElem' => $codeElem
         ]);
 
-        $dbInterventions->query("INSERT INTO HistoMaj VALUES (:codeDoc, :numLig, :codeElem, :quantite, GETDATE())", [
+        $dbInterventions->query("INSERT INTO HistoMaj  VALUES (:codeDoc, :numLig, :codeElem, :quantite, 0, GETDATE())", [
             'codeDoc' => $line['CodeDoc'],
             'numLig' => $line['NumLig'],
             'codeElem' => $codeElem,
