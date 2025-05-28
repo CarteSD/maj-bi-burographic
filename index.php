@@ -37,9 +37,11 @@ foreach ($toutesLesLignes as $line) {
     }
 }
 
-$html = '<table border="1" style="border-collapse: collapse; width: 100%;">
+$html = '<form action="ignore.php" method="post" id="ignore-form">
+<table border="1" style="border-collapse: collapse; width: 100%;">
     <thead>
         <tr style="background-color: #f2f2f2;">
+            <th>Sélectionner</th>
             <th>Bon d\'intervention</th>
             <th>Libellé</th>
             <th>Code Élément</th>
@@ -57,6 +59,7 @@ if (empty($lignesAMettreAJour)) {
     // Ajouter chaque ligne à mettre à jour
     foreach ($lignesAMettreAJour as $line) {
         $html .= '<tr>
+            <td><input type="checkbox" class="line-checkbox" name="ignore[]" value="' . htmlspecialchars($line['CodeDoc'] . '|' . $line['NumLig']) . '|' . $line['CodeElem'] . '|' . $line['Qte'] . '"></td>
             <td>' . htmlspecialchars($line['CodeDoc']) . '</td>
             <td>' . htmlspecialchars($dbBatigest->query("SELECT LibelleStd FROM ElementDef WHERE Code = :code", ["code" => $line["CodeElem"]])->fetch()["LibelleStd"]) . '</td>
             <td>' . htmlspecialchars($line['CodeElem']) . '</td>
@@ -66,6 +69,28 @@ if (empty($lignesAMettreAJour)) {
 }
 
 $html .= '</tbody></table>';
+
+// Ajouter les boutons d'action si des lignes sont présentes
+if (!empty($lignesAMettreAJour)) {
+    $html .= '<div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px;">
+        <button type="submit" class="ignore-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41z"/></svg>
+            Ignorer la sélection
+        </button>
+        <button type="button" onclick="document.getElementById(\'update-form\').submit();" class="update-all-btn" style="text-decoration: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21q-1.875 0-3.512-.712t-2.85-1.925t-1.925-2.85T3 12t.713-3.512t1.924-2.85t2.85-1.925T12 3q2.05 0 3.888.875T19 6.35V5q0-.425.288-.712T20 4t.713.288T21 5v4q0 .425-.288.713T20 10h-4q-.425 0-.712-.288T15 9t.288-.712T16 8h1.75q-1.025-1.4-2.525-2.2T12 5Q9.075 5 7.038 7.038T5 12t2.038 4.963T12 19q2.375 0 4.25-1.425t2.475-3.675q.125-.4.45-.6t.725-.15q.425.05.675.362t.15.688q-.725 2.975-3.15 4.888T12 21m1-9.4l2.5 2.5q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-2.8-2.8q-.15-.15-.225-.337T11 11.975V8q0-.425.288-.712T12 7t.713.288T13 8z"/></svg>
+            Tout mettre à jour
+        </a>
+    </div>';
+}
+
+$html .= '</form>';
+
+// Ajouter un formulaire caché pour la mise à jour complète
+$html .= '<form action="maj.php" method="post" id="update-form" style="display:none;">
+    <input type="hidden" name="update_all" value="1">
+</form>';
+
 
 $template = str_replace('{{interventions}}', $html, $template);
 
