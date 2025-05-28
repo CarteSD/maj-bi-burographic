@@ -45,6 +45,13 @@ try {
         }
     }
 
+    if (empty($lignesAMettreAJour)) {
+        $_SESSION['success_message'] = false;
+        $_SESSION['message_details'] = "Aucune ligne à mettre à jour.";
+        header('Location: index.php');
+        exit;
+    }
+
     $nbLignesTraitees = 0;
     foreach ($lignesAMettreAJour as $line) {
         $codeElem = $line['CodeElem'];
