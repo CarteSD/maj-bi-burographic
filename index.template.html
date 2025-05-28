@@ -344,8 +344,16 @@
 <script>
     function selectAllLines() {
         const checkboxes = document.querySelectorAll('.line-checkbox');
+
+        let allChecked = true;
         checkboxes.forEach(checkbox => {
-            checkbox.checked = true;
+            if (!checkbox.checked) {
+                allChecked = false;
+            }
+        });
+
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = !allChecked;
         });
         updateIgnoreButtonState();
     }
