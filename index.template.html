@@ -178,6 +178,7 @@
 
         tr:hover {
             background-color: rgba(50, 183, 188, 0.05);
+            cursor: pointer;
         }
 
         .empty-message {
@@ -346,5 +347,32 @@
         checkboxes.forEach(checkbox => {
             checkbox.checked = true;
         });
+        updateIgnoreButtonState();
     }
+    
+    function updateIgnoreButtonState() {
+        const checkboxes = document.querySelectorAll('.line-checkbox');
+        const ignoreButton = document.querySelector('.ignore-btn');
+        
+        if (!ignoreButton) return;
+        
+        let atLeastOneChecked = false;
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                atLeastOneChecked = true;
+                return;
+            }
+        });
+        
+        ignoreButton.disabled = !atLeastOneChecked;
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('.ignore-btn').disabled = true;
+        
+        const checkboxes = document.querySelectorAll('.line-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateIgnoreButtonState);
+        });
+    });
 </script>
