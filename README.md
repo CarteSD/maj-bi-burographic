@@ -19,4 +19,12 @@ Lorsque l'utilisateur se rend sur la page web `index.php`, un tableau recense l'
 - Insertion dans la table `HistoMaj`, dans la base de données secondaire, en valorisant l'attribut `Ignored` à 1 pour indiquer sur cette ligne a été notée comme ignorée, et qui n'a donc pas mis à jour le stock?
 
 ### Bouton "Consulter le journal" :
-Permet de consulter l'ensemble des mises à jour déjà effectuée en indiquant pour chaque mise à jour si il s'agit d'un élément ignoré, ou bien une mise à jour du stock théorique sur la base de données de Batigest Connect.
+Permet de consulter l'ensemble des lignes déjà traitées en indiquant pour chacune si il s'agit d'un élément ignoré, ou bien une mise à jour du stock théorique sur la base de données de Batigest Connect.
+
+## Installation et configuration
+> [!WARNING]
+> Cette application nécessite de posséder Batigest Connect accompangé de sa base de données.
+
+Après avoir cloné le dépôt, exécutez le `script.sql` sur l'instance de Batigest Connect, afin d'y ajouter la base de données secondaire.
+
+Modifiez le fichier `config.php` en y insérant vos constantes de connexion pour les deux bases de données.
