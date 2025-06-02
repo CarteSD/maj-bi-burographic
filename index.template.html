@@ -416,9 +416,12 @@
         });
     });
 
-    function selectCheckbox(e) {
-        let checkbox = e.querySelectorAll('.line-checkbox')[0];
-        checkbox.checked = !checkbox.checked;
+    function selectCheckbox(row) {
+        const checkbox = row.querySelector('.line-checkbox');
+        const isCheckboxClick = event.target.type === 'checkbox';
+        if (!isCheckboxClick) {
+            checkbox.checked = !checkbox.checked;
+        }
         updateIgnoreButtonState();
     }
 </script>
