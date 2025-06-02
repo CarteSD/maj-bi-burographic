@@ -9,10 +9,10 @@
  */
 
 require_once 'Db.php';
+session_start();
 
 // Vérifier si des lignes ont été sélectionnées
 if (!isset($_POST['ignore']) || !is_array($_POST['ignore']) || empty($_POST['ignore'])) {
-    session_start();
     $_SESSION['success_message'] = false;
     $_SESSION['message_details'] = "Aucune ligne sélectionnée.";
     header('Location: index.php');
@@ -21,14 +21,11 @@ if (!isset($_POST['ignore']) || !is_array($_POST['ignore']) || empty($_POST['ign
 
 // Vérifier quelle action a été demandée
 if (!isset($_POST['action']) || ($_POST['action'] !== 'ignore' && $_POST['action'] !== 'update')) {
-    session_start();
     $_SESSION['success_message'] = false;
     $_SESSION['message_details'] = "Action non reconnue.";
     header('Location: index.php');
     exit;
 }
-
-session_start();
 
 $action = $_POST['action'];
 $selectedLines = $_POST['ignore'] ?? [];
