@@ -54,8 +54,8 @@ if (empty($journalEntries)) {
         
         // Déterminer le statut
         $statut = isset($entry['Ignored']) && $entry['Ignored'] == 1 
-            ? '<span style="color: var(--rose);">Ignoré</span>' 
-            : '<span style="color: var(--bleu);">Traité</span>';
+            ? '<span style="color: var(--rose);">Ignorée</span>' 
+            : '<span style="color: var(--bleu);">MàJ</span>';
         
         $html .= '<tr>
             <td>' . htmlspecialchars($entry['CodeDoc']) . '</td>
