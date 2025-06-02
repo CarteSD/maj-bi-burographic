@@ -88,6 +88,7 @@ $html .= '<div style="display: flex; justify-content: flex-end; gap: 10px; margi
 $html .= '</form>';
 
 // Ajouter un formulaire caché pour la mise à jour complète
+// Ce formulaire est soumis lorsque l'utilisateur clique sur "Tout mettre à jour" grâce au script JavaScript ajouté à l'évènement onclick du bouton
 $html .= '<form action="maj.php" method="post" id="update-form" style="display:none;">
     <input type="hidden" name="update_all" value="1">
 </form>';
