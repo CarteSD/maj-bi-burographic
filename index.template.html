@@ -101,32 +101,6 @@
             margin: 0;
         }
 
-        .update-all-btn {
-            background-color: var(--orange);
-            color: var(--blanc);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-family: 'Urbanist', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: background-color 0.3s ease;
-        }
-
-        .update-all-btn:hover {
-            background-color: #e07e00;
-            scale: 105%;
-            transition: all;
-            transition-duration: 0.2s;
-        }
-
-        .update-all-btn svg {
-            margin-right: 8px;
-        }
-
         .subtitle {
             color: var(--bleu);
             font-size: 1.1rem;
@@ -274,8 +248,7 @@
         }
 
         .select-all-btn:disabled, 
-        .ignore-btn:disabled, 
-        .update-all-btn:disabled {
+        .ignore-btn:disabled {
             background-color: #cccccc !important;
             color: #666666 !important;
             cursor: not-allowed;
@@ -283,8 +256,7 @@
         }
 
         .select-all-btn:disabled:hover, 
-        .ignore-btn:disabled:hover, 
-        .update-all-btn:disabled:hover {
+        .ignore-btn:disabled:hover {
             scale: 100%;
             background-color: #cccccc !important;
         }
@@ -315,6 +287,44 @@
 
         .log-btn svg {
             margin-right: 8px;
+        }
+
+        .update-selected-btn {
+            background-color: var(--orange);
+            color: var(--blanc);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-family: 'Urbanist', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .update-selected-btn:hover {
+            background-color: #e08600;
+            scale: 105%;
+            transition: all;
+            transition-duration: 0.2s;
+        }
+
+        .update-selected-btn svg {
+            margin-right: 8px;
+        }
+
+        .update-selected-btn:disabled {
+            background-color: #cccccc !important;
+            color: #666666 !important;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .update-selected-btn:disabled:hover {
+            scale: 100%;
+            background-color: #cccccc !important;
         }
 
         @media (max-width: 768px) {
@@ -387,14 +397,15 @@
         checkboxes.forEach(checkbox => {
             checkbox.checked = !allChecked;
         });
-        updateIgnoreButtonState();
+        updateButtonsState();
     }
     
-    function updateIgnoreButtonState() {
+    function updateButtonsState() {
         const checkboxes = document.querySelectorAll('.line-checkbox');
         const ignoreButton = document.querySelector('.ignore-btn');
+        const updateSelectedButton = document.querySelector('.update-selected-btn');
         
-        if (!ignoreButton) return;
+        if (!ignoreButton || !updateSelectedButton) return;
         
         let atLeastOneChecked = false;
         checkboxes.forEach(checkbox => {
@@ -405,14 +416,24 @@
         });
         
         ignoreButton.disabled = !atLeastOneChecked;
+        updateSelectedButton.disabled = !atLeastOneChecked;
     }
     
     document.addEventListener('DOMContentLoaded', function() {
-        document.querySelector('.ignore-btn').disabled = true;
+        const ignoreButton = document.querySelector('.ignore-btn');
+        const updateSelectedButton = document.querySelector('.update-selected-btn');
+        
+        if (ignoreButton) {
+            ignoreButton.disabled = true;
+        }
+        
+        if (updateSelectedButton) {
+            updateSelectedButton.disabled = true;
+        }
         
         const checkboxes = document.querySelectorAll('.line-checkbox');
         checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', updateIgnoreButtonState);
+            checkbox.addEventListener('change', updateButtonsState);
         });
     });
 
@@ -422,6 +443,6 @@
         if (!isCheckboxClick) {
             checkbox.checked = !checkbox.checked;
         }
-        updateIgnoreButtonState();
+        updateButtonsState();
     }
 </script>
