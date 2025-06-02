@@ -120,8 +120,6 @@ try {
         $message = "$nbLignesTraitees ligne(s) traitée(s).<br><br>" . count($lignesEchouees) . " ligne(s) n'ont pas pu être mise(s) à jour à cause d'un stock insuffisant:<br>";
         
         foreach ($lignesEchouees as $ligne) {
-            // var_dump($ligne);
-            // exit;
             $message .= "<p><strong>{$ligne['CodeDoc']} - {$ligne['Libelle']}</strong> : " .
                        "Stock requis: {$ligne['QteRequis']}, " .
                        "Stock disponible: {$ligne['QteDispo']}</p>";
