@@ -55,44 +55,79 @@ try {
             ]);
         } 
         else if ($action === 'update') {
-            // Mettre à jour le stock dans Batigest
-            $typeMvt = 'S';
-            $provenance = 'I';
-            $pa = round($dbBatigest->query("SELECT PA FROM ElementDef WHERE Code = :codeElem", ['codeElem' => $codeElem])->fetch(PDO::FETCH_ASSOC)["PA"], 2);
-            $info = "Bon Intervention [". $codeDoc . "]";
+            // Vérifier le stock disponible dans Batigest
+            $stockDispo = $dbBatigest->query("SELECT (QttAppro - QttConso) AS QttStock FROM ElementStock WHERE CodeElem = :codeElem", ['codeElem' => $codeElem])->fetch(PDO::FETCH_ASSOC)["QttStock"];
 
-            $dbBatigest->query("INSERT INTO ElementMvtStock (CodeElem, TypeMvt, Provenance, Date, Quantite, PA, Info, Suivi, TypeOrigine, Origine, Destination) 
-                        VALUES (:codeElem, :typeMvt, :provenance, GETDATE(), :quantite, :pa, :info, 0, '', '', '')", [
-                'codeElem' => $codeElem,
-                'typeMvt' => $typeMvt,
-                'provenance' => $provenance,
-                'quantite' => $qte,
-                'pa' => $pa,
-                'info' => $info
-            ]);
+            if ($stockDispo && $stockDispo >= $qte) {
+                // Mettre à jour le stock dans Batigest
+                $typeMvt = 'S';
+                $provenance = 'I';
+                $pa = round($dbBatigest->query("SELECT PA FROM ElementDef WHERE Code = :codeElem", ['codeElem' => $codeElem])->fetch(PDO::FETCH_ASSOC)["PA"], 2);
+                $info = "Bon Intervention [". $codeDoc . "]";
 
-            $dbBatigest->query("UPDATE ElementStock SET QttConso = QttConso + :quantite WHERE CodeElem = :codeElem", [
-                'quantite' => $qte,
-                'codeElem' => $codeElem
-            ]);
+                $dbBatigest->query("INSERT INTO ElementMvtStock (CodeElem, TypeMvt, Provenance, Date, Quantite, PA, Info, Suivi, TypeOrigine, Origine, Destination) 
+                            VALUES (:codeElem, :typeMvt, :provenance, GETDATE(), :quantite, :pa, :info, 0, '', '', '')", [
+                    'codeElem' => $codeElem,
+                    'typeMvt' => $typeMvt,
+                    'provenance' => $provenance,
+                    'quantite' => $qte,
+                    'pa' => $pa,
+                    'info' => $info
+                ]);
 
-            // Insérer dans la table HistoMaj comme mise à jour
-            $dbInterventions->query("INSERT INTO HistoMaj VALUES (:codeDoc, :numLig, :codeElem, :quantite, 0, GETDATE())", [
-                'codeDoc' => $codeDoc,
-                'numLig' => $numLig,
-                'codeElem' => $codeElem,
-                'quantite' => $qte
-            ]);
+                $dbBatigest->query("UPDATE ElementStock SET QttConso = QttConso + :quantite WHERE CodeElem = :codeElem", [
+                    'quantite' => $qte,
+                    'codeElem' => $codeElem
+                ]);
+
+                // Insérer dans la table HistoMaj comme mise à jour
+                $dbInterventions->query("INSERT INTO HistoMaj VALUES (:codeDoc, :numLig, :codeElem, :quantite, 0, GETDATE())", [
+                    'codeDoc' => $codeDoc,
+                    'numLig' => $numLig,
+                    'codeElem' => $codeElem,
+                    'quantite' => $qte
+                ]);
+            }
+            else {
+                $libelle = $dbBatigest->query("SELECT LibelleStd FROM ElementDef WHERE Code = :codeElem", ['codeElem' => $codeElem])->fetch(PDO::FETCH_ASSOC)["LibelleStd"];
+                
+                $lignesEchouees[] = [
+                    'CodeDoc' => $codeDoc,
+                    'NumLig' => $numLig,
+                    'CodeElem' => $codeElem,
+                    'Libelle' => $libelle,
+                    'QteRequis' => $qte,
+                    'QteDispo' => $stockDispo
+                ];
+            }
         }
         
         $nbLignesTraitees++;
     }
     
-    $_SESSION['success_message'] = true;
-    if ($action === 'ignore') {
-        $_SESSION['message_details'] = "$nbLignesTraitees ligne(s) ignorée(s) avec succès.";
+    if (empty($lignesEchouees)) {
+        $_SESSION['success_message'] = true;
+        if ($action === 'ignore') {
+            $_SESSION['message_details'] = "$nbLignesTraitees ligne(s) ignorée(s) avec succès.";
+        } else {
+            $_SESSION['message_details'] = "$nbLignesTraitees ligne(s) mise(s) à jour avec succès.";
+        }
     } else {
-        $_SESSION['message_details'] = "$nbLignesTraitees ligne(s) mise(s) à jour avec succès.";
+        // Il y a des lignes qui n'ont pas pu être traitées à cause du stock insuffisant
+        $_SESSION['success_message'] = false;
+        
+        // Construire le message d'erreur détaillé
+        $message = "$nbLignesTraitees ligne(s) traitée(s). " . count($lignesEchouees) . " ligne(s) n'ont pas pu être mise(s) à jour à cause d'un stock insuffisant:<br>";
+        
+        foreach ($lignesEchouees as $ligne) {
+            // var_dump($ligne);
+            // exit;
+            $message .= "<p><strong>{$ligne['CodeDoc']} - {$ligne['Libelle']}</strong> : " .
+                       "Stock requis: {$ligne['QteRequis']}, " .
+                       "Stock disponible: {$ligne['QteDispo']}</p>";
+        }
+        
+        $_SESSION['message_details'] = $message;
     }
     
 } catch (Exception $e) {

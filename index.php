@@ -97,7 +97,7 @@ if (isset($_SESSION['success_message'])) {
             '{{success}}',
             '<div class="alert alert-success">
                 <i class="fa fa-check-circle"></i>
-                <span>' . (isset($_SESSION['message_details']) ? htmlspecialchars($_SESSION['message_details']) : 'Mise à jour réussie !') . '</span>
+                <span>' . (isset($_SESSION['message_details']) ? $_SESSION['message_details'] : 'Mise à jour réussie !') . '</span>
             </div>',
             $template
         );
@@ -106,7 +106,7 @@ if (isset($_SESSION['success_message'])) {
             '{{success}}',
             '<div class="alert alert-error">
                 <i class="fa fa-exclamation-triangle"></i>
-                <span>' . (isset($_SESSION['message_details']) ? htmlspecialchars($_SESSION['message_details']) : 'Erreur lors de la mise à jour.') . '</span>
+                <span>' . (isset($_SESSION['message_details']) ? $_SESSION['message_details'] : 'Erreur lors de la mise à jour.') . '</span>
             </div>',
             $template
         );
