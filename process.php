@@ -117,7 +117,7 @@ try {
         $_SESSION['success_message'] = false;
         
         // Construire le message d'erreur détaillé
-        $message = "$nbLignesTraitees ligne(s) traitée(s). " . count($lignesEchouees) . " ligne(s) n'ont pas pu être mise(s) à jour à cause d'un stock insuffisant:<br>";
+        $message = "$nbLignesTraitees ligne(s) traitée(s).<br><br>" . count($lignesEchouees) . " ligne(s) n'ont pas pu être mise(s) à jour à cause d'un stock insuffisant:<br>";
         
         foreach ($lignesEchouees as $ligne) {
             // var_dump($ligne);
