@@ -8,6 +8,7 @@
  * @version  0.0
  */
 
+ require_once 'config.php';
 
 /**
  * @brief Classe Db
@@ -66,16 +67,16 @@ class Db
     {
         $config = [
             'interventions' => [
-                'servername' => 'DESKTOP-D5H040D\\SAGEBAT',
-                'database' => 'INTERVENTIONS',
-                'username' => null,
-                'password' => null,
+                'servername' => DB_SERVER,
+                'database' => DB_INTERVENTIONS,
+                'username' => DB_USERNAME,
+                'password' => DB_PASSWORD,
             ],
             'batigest' => [
-                'servername' => 'DESKTOP-D5H040D\\SAGEBAT',
-                'database' => 'BTG_DOS_SOC01',
-                'username' => null,
-                'password' => null,
+                'servername' => DB_SERVER,
+                'database' => DB_BATIGEST,
+                'username' => DB_USERNAME,
+                'password' => DB_PASSWORD,
             ],
         ];
 
