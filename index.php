@@ -17,7 +17,7 @@ $dbInterventions = Db::getInstance('interventions');
 $dbBatigest = Db::getInstance('batigest');
 
 $lignesMisesAJour = $dbInterventions->query('SELECT * FROM HistoMaj')->fetchAll(PDO::FETCH_ASSOC);
-$toutesLesLignes = $dbBatigest->query("SELECT IntervLigne.CodeDoc, IntervLigne.NumLig, IntervLigne.CodeElem, IntervLigne.Qte FROM IntervLigne JOIN Interv ON IntervLigne.CodeDoc = Interv.Code WHERE IntervLigne.TypeLigne = 'A' AND Interv.Etat = 'R' AND Interv.EtatFact = 'N'")->fetchAll(PDO::FETCH_ASSOC);
+$toutesLesLignes = $dbBatigest->query("SELECT IntervLigne.CodeDoc, IntervLigne.NumLig, IntervLigne.CodeElem, IntervLigne.Qte FROM IntervLigne JOIN Interv ON IntervLigne.CodeDoc = Interv.Code WHERE IntervLigne.TypeLigne = 'A' AND Interv.Etat = 'R' AND Interv.EtatFact = 'N' ORDER BY Interv.Code ASC")->fetchAll(PDO::FETCH_ASSOC);
 
 $lignesAMettreAJour = [];
 $majExistantes = [];
