@@ -29,8 +29,6 @@ if (!isset($_POST['action']) || $_POST['action'] !== 'update') {
 
 $action = $_POST['action'];
 $selectedLines = $_POST['selected'] ?? [];
-var_dump($selectedLines); // Pour débogage, à supprimer en production
-exit;
 
 try {
     $dbBatigest = Db::getInstance('batigest');
