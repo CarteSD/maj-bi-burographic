@@ -28,12 +28,23 @@ foreach ($lignesMisesAJour as $maj) {
 foreach ($toutesLesLignes as $line) {
     $key = $line['CodeDoc'].'|'.$line['NumLig'];
     if (!isset($majExistantes[$key])) {
+        $sortieMvt = $dbBatigest->query("SELECT COUNT(*) AS nb FROM ElementMvtStock WHERE TypeMvt = 'S' AND CodeElem = :codeElem AND Quantite = :qte AND Info = :info", [
+            'codeElem' => $line['CodeElem'],
+            'qte' => $line['Qte'],
+            'info' => $line['CodeDoc']
+        ])->fetch(PDO::FETCH_ASSOC);
+
+        if ($sortieMvt['nb'] > 0) {
+            continue;
+        }
+
         $lignesAMettreAJour[] = [
             'CodeDoc' => $line['CodeDoc'],
             'NumLig' => $line['NumLig'],
             'CodeElem' => $line['CodeElem'],
             'Qte' => $line['Qte'],
         ];
+        
     }
 }
 

@@ -63,7 +63,7 @@ try {
                 $typeMvt = 'S';
                 $provenance = 'I';
                 $pa = round($dbBatigest->query("SELECT PA FROM ElementDef WHERE Code = :codeElem", ['codeElem' => $codeElem])->fetch(PDO::FETCH_ASSOC)["PA"], 2);
-                $info = "Bon Intervention [". $codeDoc . "]";
+                $info = $codeDoc;
 
                 $dbBatigest->query("INSERT INTO ElementMvtStock (CodeElem, TypeMvt, Provenance, Date, Quantite, PA, Info, Suivi, TypeOrigine, Origine, Destination) 
                             VALUES (:codeElem, :typeMvt, :provenance, GETDATE(), :quantite, :pa, :info, 0, '', '', '')", [
