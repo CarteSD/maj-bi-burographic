@@ -12,7 +12,7 @@ require_once 'Db.php';
 session_start();
 
 // Vérifier si des lignes ont été sélectionnées
-if (!isset($_POST['ignore']) || !is_array($_POST['ignore']) || empty($_POST['ignore'])) {
+if (!isset($_POST['selected']) || !is_array($_POST['selected']) || empty($_POST['selected'])) {
     $_SESSION['success_message'] = false;
     $_SESSION['message_details'] = "Aucune ligne sélectionnée.";
     header('Location: index.php');
@@ -20,7 +20,7 @@ if (!isset($_POST['ignore']) || !is_array($_POST['ignore']) || empty($_POST['ign
 }
 
 // Vérifier quelle action a été demandée
-if (!isset($_POST['action']) || ($_POST['action'] !== 'ignore' && $_POST['action'] !== 'update')) {
+if (!isset($_POST['action']) || $_POST['action'] !== 'update') {
     $_SESSION['success_message'] = false;
     $_SESSION['message_details'] = "Action non reconnue.";
     header('Location: index.php');
@@ -28,7 +28,9 @@ if (!isset($_POST['action']) || ($_POST['action'] !== 'ignore' && $_POST['action
 }
 
 $action = $_POST['action'];
-$selectedLines = $_POST['ignore'] ?? [];
+$selectedLines = $_POST['selected'] ?? [];
+var_dump($selectedLines); // Pour débogage, à supprimer en production
+exit;
 
 try {
     $dbBatigest = Db::getInstance('batigest');

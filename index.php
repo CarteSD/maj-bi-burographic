@@ -59,7 +59,7 @@ if (empty($lignesAMettreAJour)) {
     // Ajouter chaque ligne à mettre à jour
     foreach ($lignesAMettreAJour as $line) {
         $html .= '<tr onclick="selectCheckbox(this)">
-            <td><input type="checkbox" class="line-checkbox" name="ignore[]" value="' . htmlspecialchars($line['CodeDoc'] . '|' . $line['NumLig']) . '|' . $line['CodeElem'] . '|' . $line['Qte'] . '"></td>
+            <td><input type="checkbox" class="line-checkbox" name="selected[]" value="' . htmlspecialchars($line['CodeDoc'] . '|' . $line['NumLig']) . '|' . $line['CodeElem'] . '|' . $line['Qte'] . '"></td>
             <td>' . htmlspecialchars($line['CodeDoc']) . '</td>
             <td>' . htmlspecialchars($dbBatigest->query("SELECT LibelleStd FROM ElementDef WHERE Code = :code", ["code" => $line["CodeElem"]])->fetch()["LibelleStd"]) . '</td>
             <td>' . htmlspecialchars($line['CodeElem']) . '</td>
