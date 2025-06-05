@@ -17,25 +17,19 @@
  */
 class Db
 {
-    private static array $instance = [];
+    private static ?Db $instance = null;
     private PDO $conn;
 
     /**
      * Constructeur privé pour la classe Db
      * 
      * @brief Initialise la connexion à la base de données
-     * @details Crée une nouvelle connexion PDO à la base de données spécifiée
-     * en utilisant les configurations définies dans getDbConfig
-     * 
-     * @param string $dbName Le nom de la base de données à laquelle se connecter
      * @throws PDOException Si la connexion à la base de données échoue
      */
-    private function __construct(string $dbName)
+    private function __construct()
     {
-        $config = self::getDbConfig($dbName);
-
         try {
-            $this->conn = new PDO("sqlsrv:Server={$config['servername']};Database={$config['database']}", $config['username'], $config['password']);
+            $this->conn = new PDO("sqlsrv:Server=" . DB_SERVER . ";Database=" . DB_BATIGEST, DB_USERNAME, DB_PASSWORD);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -53,55 +47,19 @@ class Db
     }
 
     /**
-     * Méthode statique pour obtenir la configuration de la base de données
+     * Méthode statique pour obtenir l'instance unique de la classe Db
      * 
-     * @brief Retourne la configuration de la base de données spécifiée
-     * @details Renvoie un tableau contenant les informations de connexion
-     * pour la base de données demandée
-     * 
-     * @param string $dbName Le nom de la base de données
-     * @return array La configuration de la base de données
-     * @throws InvalidArgumentException Si le nom de la base de données n'est pas reconnu
-     */
-    private static function getDbConfig(string $dbName): array
-    {
-        $config = [
-            'interventions' => [
-                'servername' => DB_SERVER,
-                'database' => DB_INTERVENTIONS,
-                'username' => DB_USERNAME,
-                'password' => DB_PASSWORD,
-            ],
-            'batigest' => [
-                'servername' => DB_SERVER,
-                'database' => DB_BATIGEST,
-                'username' => DB_USERNAME,
-                'password' => DB_PASSWORD,
-            ],
-        ];
-
-        if (!array_key_exists($dbName, $config)) {
-            throw new InvalidArgumentException("Database configuration for '$dbName' not found.");
-        }
-
-        return $config[$dbName];
-    }
-
-    /**
-     * Méthode statique pour obtenir une instance de la classe Db
-     * 
-     * @brief Retourne une instance de la classe Db pour la base de données spécifiée
+     * @brief Retourne l'instance unique de la classe Db
      * @details Si l'instance n'existe pas, elle est créée. Sinon, l'instance existante est retournée.
      * 
-     * @param string $dbName Le nom de la base de données à laquelle se connecter
-     * @return Db L'instance de la classe Db pour la base de données spécifiée
+     * @return Db L'instance unique de la classe Db
      */
     public static function getInstance(string $dbName): Db
     {
-        if (!array_key_exists($dbName, self::$instance)) {
-            self::$instance[$dbName] = new Db($dbName);
+        if (self::$instance === null) {
+            self::$instance= new Db($);
         }
-        return self::$instance[$dbName];
+        return self::$instance;
     }
 
     /**
