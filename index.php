@@ -13,21 +13,43 @@ require_once 'Db.php';
 $template = file_get_contents('index.template.html');
 
 $dbBatigest = Db::getInstance('batigest');
-$toutesLesLignes = $dbBatigest->query("SELECT IntervLigne.CodeDoc, IntervLigne.NumLig, IntervLigne.CodeElem, IntervLigne.Qte FROM IntervLigne JOIN Interv ON IntervLigne.CodeDoc = Interv.Code WHERE IntervLigne.TypeLigne = 'A' AND Interv.Etat = 'R' AND Interv.EtatFact = 'N' ORDER BY Interv.Code ASC")->fetchAll(PDO::FETCH_ASSOC);
+
+// Récupérer toutes les lignes d'intervention réalisées (R) et non facturées (N)
+$toutesLesLignes = $dbBatigest->query(
+    "SELECT IntervLigne.CodeDoc, IntervLigne.NumLig, IntervLigne.CodeElem, IntervLigne.Qte
+    FROM IntervLigne
+    JOIN Interv ON IntervLigne.CodeDoc = Interv.Code
+    WHERE IntervLigne.TypeLigne = 'A'
+    AND Interv.Etat = 'R'
+    AND Interv.EtatFact = 'N'
+    ORDER BY Interv.Code ASC"
+)->fetchAll(PDO::FETCH_ASSOC);
 
 $lignesAMettreAJour = [];
+// Parcourir toutes les lignes d'intervention afin de vérifier les mouvements de stock
 foreach ($toutesLesLignes as $line) {
-    $key = $line['CodeDoc'].'|'.$line['NumLig'];
-    $sortieMvt = $dbBatigest->query("SELECT COUNT(*) AS nb FROM ElementMvtStock WHERE TypeMvt = 'S' AND CodeElem = :codeElem AND Quantite = :qte AND Info = :info", [
-        'codeElem' => $line['CodeElem'],
-        'qte' => $line['Qte'],
-        'info' => $line['CodeDoc']
-    ])->fetch(PDO::FETCH_ASSOC);
 
+    // Vérification de l'existence d'un mouvement de stock de sortie pour cette ligne
+    $sortieMvt = $dbBatigest->query(
+        "SELECT COUNT(*) AS nb
+        FROM ElementMvtStock
+        WHERE TypeMvt = 'S'
+        AND CodeElem = :codeElem
+        AND Quantite = :qte
+        AND Info = :info", 
+        [
+            'codeElem' => $line['CodeElem'],
+            'qte' => $line['Qte'],
+            'info' => $line['CodeDoc']
+        ]
+    )->fetch(PDO::FETCH_ASSOC);
+
+    // Si un mouvement de stock de sortie existe pour cette ligne, on ne l'ajoute pas à la liste des lignes à mettre à jour
     if ($sortieMvt['nb'] > 0) {
         continue;
     }
 
+    // Si aucun mouvement de stock de sortie n'existe, on ajoute la ligne à mettre à jour
     $lignesAMettreAJour[] = [
         'CodeDoc' => $line['CodeDoc'],
         'NumLig' => $line['NumLig'],
@@ -37,14 +59,20 @@ foreach ($toutesLesLignes as $line) {
 }
 
 $lignesGroupees = [];
+// Parcourir les lignes à mettre à jour et les regrouper par CodeDoc
 foreach ($lignesAMettreAJour as $ligne) {
     $codeDoc = $ligne['CodeDoc'];
+
+    // Vérifier s'il existe déjà une clé pour ce CodeDoc
     if (!isset($lignesGroupees[$codeDoc])) {
         $lignesGroupees[$codeDoc] = [];
     }
+
+    // Ajouter la ligne au groupe correspondant
     $lignesGroupees[$codeDoc][] = $ligne;
 }
 
+// Générer le HTML pour afficher le tableau des lignes à mettre à jour
 $html = '<form action="process.php" method="post" id="process-form">
 <table border="1" style="border-collapse: collapse; width: 100%;">
     <thead>
@@ -58,9 +86,10 @@ $html = '<form action="process.php" method="post" id="process-form">
     </thead>
     <tbody>';
 
+// Remplacer le nombre de BI dans le template
 $template = str_replace('{{nb_bi}}', count($lignesAMettreAJour), $template);
 
-// Si aucune ligne à mettre à jour
+// Si aucune ligne à mettre à jour afficher un message
 if (empty($lignesAMettreAJour)) {
     $html .= '<tr><td colspan="5" style="text-align: center;">Aucune intervention à mettre à jour</td></tr>';
 } else {
@@ -68,26 +97,37 @@ if (empty($lignesAMettreAJour)) {
     foreach ($lignesGroupees as $codeDoc => $lignes) {
         $nbLignes = count($lignes);
         
-        // Première ligne du groupe
+        // Première ligne du groupe différente des autres car elle contient les checkboxes
         $premiereLigne = $lignes[0];
         $html .= '<tr onclick="selectBIGroup(\'' . htmlspecialchars($codeDoc) . '\')">';
         
-        // Case à cocher avec rowspan
+        // Case à cocher avec rowspan pour prendre toute la hauteur du groupe
         $html .= '<td rowspan="' . $nbLignes . '" style="vertical-align: middle; text-align: center;">
             <input type="checkbox" class="bi-checkbox" data-bi="' . htmlspecialchars($codeDoc) . '" onchange="toggleBIGroup(\'' . htmlspecialchars($codeDoc) . '\')">';
         
-        // Ajouter les checkboxes cachées pour chaque ligne du groupe
+        // Ajouter les checkboxes cachées pour chaque ligne du groupe (nécessaire pour le traitement)
         foreach ($lignes as $ligne) {
             $html .= '<input type="checkbox" class="line-checkbox hidden-checkbox" data-bi="' . htmlspecialchars($codeDoc) . '" name="selected[]" value="' . htmlspecialchars($ligne['CodeDoc'] . '|' . $ligne['NumLig'] . '|' . $ligne['CodeElem'] . '|' . $ligne['Qte']) . '" style="display: none;">';
         }
         
         $html .= '</td>';
         
-        // BI avec rowspan
+        // BI avec rowspan pour prendre toute la hauteur du groupe
         $html .= '<td rowspan="' . $nbLignes . '" style="vertical-align: middle;">' . htmlspecialchars($codeDoc) . '</td>';
         
         // Détails de la première ligne
-        $libelle = $dbBatigest->query("SELECT LibelleStd FROM ElementDef WHERE Code = :code", ["code" => $premiereLigne["CodeElem"]])->fetch()["LibelleStd"];
+
+        // Récupérer le libellé de l'élément
+        $libelle = $dbBatigest->query(
+            "SELECT LibelleStd
+            FROM ElementDef
+            WHERE Code = :code",
+            [
+                "code" => $premiereLigne["CodeElem"]
+            ]
+        )->fetch()["LibelleStd"];
+
+        // Afficher le libellé, le code élément et la quantité
         $html .= '<td>' . htmlspecialchars($libelle) . '</td>';
         $html .= '<td>' . htmlspecialchars($premiereLigne['CodeElem']) . '</td>';
         $html .= '<td>' . htmlspecialchars((int)$premiereLigne['Qte']) . '</td>';
@@ -98,7 +138,17 @@ if (empty($lignesAMettreAJour)) {
             $ligne = $lignes[$i];
             $html .= '<tr onclick="selectBIGroup(\'' . htmlspecialchars($codeDoc) . '\')">';
             
-            $libelle = $dbBatigest->query("SELECT LibelleStd FROM ElementDef WHERE Code = :code", ["code" => $ligne["CodeElem"]])->fetch()["LibelleStd"];
+            // Récupération du libellé de l'élément
+            $libelle = $dbBatigest->query(
+                "SELECT LibelleStd
+                FROM ElementDef
+                WHERE Code = :code",
+                [
+                    "code" => $ligne["CodeElem"]
+                ]
+            )->fetch()["LibelleStd"];
+
+            // Afficher le libellé, le code élément et la quantité
             $html .= '<td>' . htmlspecialchars($libelle) . '</td>';
             $html .= '<td>' . htmlspecialchars($ligne['CodeElem']) . '</td>';
             $html .= '<td>' . htmlspecialchars((int)$ligne['Qte']) . '</td>';
@@ -109,6 +159,7 @@ if (empty($lignesAMettreAJour)) {
 
 $html .= '</tbody></table>';
 
+// Ajouter les boutons de sélection et de mise à jour
 $html .= '<div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px;">
     <button type="button" class="select-all-btn" onclick="selectAllLines()"' . (empty($lignesAMettreAJour) ? ' disabled' : '') . '>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 2v6M2 5h6m4 0h3m-3 17h3m3-17h.5A3.5 3.5 0 0 1 22 8.5V9m0 9v.5a3.5 3.5 0 0 1-3.5 3.5H18m-9 0h-.5A3.5 3.5 0 0 1 5 18.5V18m17-6v3M5 12v3" color="currentColor"/></svg>
@@ -122,11 +173,14 @@ $html .= '<div style="display: flex; justify-content: flex-end; gap: 10px; margi
 
 $html .= '</form>';
 
+// Remplacer le placeholder {{interventions}} dans le template par le HTML généré
 $template = str_replace('{{interventions}}', $html, $template);
 
+// Gérer les messages de succès ou d'erreur enregistrés dans la session
 session_start();
 
 if (isset($_SESSION['success_message'])) {
+    // Si le message de succès est défini, on l'affiche
     if ($_SESSION['success_message'] === true) {
         $template = str_replace(
             '{{success}}',
@@ -136,7 +190,9 @@ if (isset($_SESSION['success_message'])) {
             </div>',
             $template
         );
-    } else {
+    }
+    // Sinon, on affiche un message d'erreur
+    else {
         $template = str_replace(
             '{{success}}',
             '<div class="alert alert-error">
@@ -146,13 +202,16 @@ if (isset($_SESSION['success_message'])) {
             $template
         );
     }
+    // Nettoyer la session après affichage du message
     unset($_SESSION['success_message']);
     if (isset($_SESSION['message_details'])) {
         unset($_SESSION['message_details']);
     }
 } else {
+    // Si aucun message n'est défini, on supprime le placeholder {{success}} du template
     $template = str_replace('{{success}}', '', $template);
 }
 
+// Afficher le template final
 echo $template;
 return;
