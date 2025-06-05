@@ -33,79 +33,124 @@ $selectedLines = $_POST['selected'] ?? [];
 try {
     $dbBatigest = Db::getInstance('batigest');
     
-    $nbLignesTraitees = 0;
-    
+    // Regrouper les lignes par BI
+    $lignesParBI = [];
     foreach ($selectedLines as $line) {
         $parts = explode('|', $line);
         if (count($parts) < 4) continue;
         
         $codeDoc = $parts[0];
-        $numLig = $parts[1];
-        $codeElem = $parts[2];
-        $qte = (int)$parts[3];
-        
-        if ($action === 'update') {
-            // Vérifier le stock disponible dans Batigest
-            $stockDispo = $dbBatigest->query("SELECT (QttAppro - QttConso) AS QttStock FROM ElementStock WHERE CodeElem = :codeElem", ['codeElem' => $codeElem])->fetch(PDO::FETCH_ASSOC)["QttStock"];
-
-            if ($stockDispo && $stockDispo >= $qte) {
-                // Mettre à jour le stock dans Batigest
-                $typeMvt = 'S';
-                $provenance = 'I';
-                $pa = round($dbBatigest->query("SELECT PA FROM ElementDef WHERE Code = :codeElem", ['codeElem' => $codeElem])->fetch(PDO::FETCH_ASSOC)["PA"], 2);
-                $info = $codeDoc;
-
-                $dbBatigest->query("INSERT INTO ElementMvtStock (CodeElem, TypeMvt, Provenance, Date, Quantite, PA, Info, Suivi, TypeOrigine, Origine, Destination) 
-                            VALUES (:codeElem, :typeMvt, :provenance, GETDATE(), :quantite, :pa, :info, 0, '', '', '')", [
-                    'codeElem' => $codeElem,
-                    'typeMvt' => $typeMvt,
-                    'provenance' => $provenance,
-                    'quantite' => $qte,
-                    'pa' => $pa,
-                    'info' => $info
-                ]);
-
-                $dbBatigest->query("UPDATE ElementStock SET QttConso = QttConso + :quantite WHERE CodeElem = :codeElem", [
-                    'quantite' => $qte,
-                    'codeElem' => $codeElem
-                ]);
-
-            }
-            else {
-                $libelle = $dbBatigest->query("SELECT LibelleStd FROM ElementDef WHERE Code = :codeElem", ['codeElem' => $codeElem])->fetch(PDO::FETCH_ASSOC)["LibelleStd"];
-                
-                $lignesEchouees[] = [
-                    'CodeDoc' => $codeDoc,
-                    'NumLig' => $numLig,
-                    'CodeElem' => $codeElem,
-                    'Libelle' => $libelle,
-                    'QteRequis' => $qte,
-                    'QteDispo' => $stockDispo
-                ];
-            }
+        if (!isset($lignesParBI[$codeDoc])) {
+            $lignesParBI[$codeDoc] = [];
         }
         
-        $nbLignesTraitees++;
+        $lignesParBI[$codeDoc][] = [
+            'codeDoc' => $parts[0],
+            'numLig' => $parts[1],
+            'codeElem' => $parts[2],
+            'qte' => (int)$parts[3]
+        ];
+    }
+    
+    $nbLignesTraitees = 0;
+    $lignesEchouees = [];
+    
+    // Traiter chaque BI
+    foreach ($lignesParBI as $codeDoc => $lignes) {
+        $biValide = true;
+        $stocksDisponibles = [];
+        
+        // 1. Vérifier d'abord toutes les lignes du BI
+        foreach ($lignes as $ligne) {
+            $stockDispo = $dbBatigest->query(
+                "SELECT (QttAppro - QttConso) AS QttStock FROM ElementStock WHERE CodeElem = :codeElem", 
+                ['codeElem' => $ligne['codeElem']]
+            )->fetch(PDO::FETCH_ASSOC)["QttStock"];
+            
+            if (!$stockDispo || $stockDispo < $ligne['qte']) {
+                $biValide = false;
+                $libelle = $dbBatigest->query(
+                    "SELECT LibelleStd FROM ElementDef WHERE Code = :codeElem",
+                    ['codeElem' => $ligne['codeElem']]
+                )->fetch(PDO::FETCH_ASSOC)["LibelleStd"];
+                
+                $lignesEchouees[] = [
+                    'CodeDoc' => $ligne['codeDoc'],
+                    'NumLig' => $ligne['numLig'],
+                    'CodeElem' => $ligne['codeElem'],
+                    'Libelle' => $libelle,
+                    'QteRequis' => $ligne['qte'],
+                    'QteDispo' => $stockDispo
+                ];
+                break; // Sortir de la boucle dès qu'une ligne est invalide
+            }
+            
+            // Stocker les informations pour la mise à jour
+            $stocksDisponibles[$ligne['codeElem']] = [
+                'stockDispo' => $stockDispo,
+                'pa' => round($dbBatigest->query(
+                    "SELECT PA FROM ElementDef WHERE Code = :codeElem",
+                    ['codeElem' => $ligne['codeElem']]
+                )->fetch(PDO::FETCH_ASSOC)["PA"], 2)
+            ];
+        }
+        
+        // 2. Si toutes les lignes du BI sont valides, les mettre à jour
+        if ($biValide) {
+            foreach ($lignes as $ligne) {
+                $typeMvt = 'S';
+                $provenance = 'I';
+                $info = $ligne['codeDoc'];
+                
+                $dbBatigest->query(
+                    "INSERT INTO ElementMvtStock (CodeElem, TypeMvt, Provenance, Date, Quantite, PA, Info, Suivi, TypeOrigine, Origine, Destination) 
+                    VALUES (:codeElem, :typeMvt, :provenance, GETDATE(), :quantite, :pa, :info, 0, '', '', '')",
+                    [
+                        'codeElem' => $ligne['codeElem'],
+                        'typeMvt' => $typeMvt,
+                        'provenance' => $provenance,
+                        'quantite' => $ligne['qte'],
+                        'pa' => $stocksDisponibles[$ligne['codeElem']]['pa'],
+                        'info' => $info
+                    ]
+                );
+                
+                $dbBatigest->query(
+                    "UPDATE ElementStock SET QttConso = QttConso + :quantite WHERE CodeElem = :codeElem",
+                    [
+                        'quantite' => $ligne['qte'],
+                        'codeElem' => $ligne['codeElem']
+                    ]
+                );
+                
+                $nbLignesTraitees++;
+            }
+        }
     }
     
     if (empty($lignesEchouees)) {
         $_SESSION['success_message'] = true;
-        if ($action === 'ignore') {
-            $_SESSION['message_details'] = "$nbLignesTraitees ligne(s) ignorée(s) avec succès.";
-        } else {
-            $_SESSION['message_details'] = "$nbLignesTraitees ligne(s) mise(s) à jour avec succès.";
-        }
+        $_SESSION['message_details'] = "$nbLignesTraitees ligne(s) mise(s) à jour avec succès.";
     } else {
-        // Il y a des lignes qui n'ont pas pu être traitées à cause du stock insuffisant
         $_SESSION['success_message'] = false;
+        $message = "$nbLignesTraitees ligne(s) mises(s) à jour.<br><br>Les bons d'intervention suivants n'ont pas pu être traités à cause d'un stock insuffisant :<br>";
         
-        // Construire le message d'erreur détaillé
-        $message = "$nbLignesTraitees ligne(s) traitée(s).<br><br>" . count($lignesEchouees) . " ligne(s) n'ont pas pu être mise(s) à jour à cause d'un stock insuffisant:<br>";
-        
+        // Grouper les messages d'erreur par BI
+        $erreurParBI = [];
         foreach ($lignesEchouees as $ligne) {
-            $message .= "<p><strong>{$ligne['CodeDoc']} - {$ligne['Libelle']}</strong> : " .
-                       "Stock requis: {$ligne['QteRequis']}, " .
-                       "Stock disponible: {$ligne['QteDispo']}</p>";
+            if (!isset($erreurParBI[$ligne['CodeDoc']])) {
+                $erreurParBI[$ligne['CodeDoc']] = [];
+            }
+            $erreurParBI[$ligne['CodeDoc']][] = $ligne;
+        }
+        
+        foreach ($erreurParBI as $codeDoc => $lignes) {
+            $message .= "<br><br><p><strong>$codeDoc</strong> :</p>";
+            foreach ($lignes as $ligne) {
+                $message .= "<strong>{$ligne['Libelle']}</strong> : " .
+                           "Stock requis: {$ligne['QteRequis']}, " .
+                           "Stock disponible: {$ligne['QteDispo']}";
+            }
         }
         
         $_SESSION['message_details'] = $message;
