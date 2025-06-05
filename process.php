@@ -31,7 +31,6 @@ $action = $_POST['action'];
 $selectedLines = $_POST['ignore'] ?? [];
 
 try {
-    $dbInterventions = Db::getInstance('interventions');
     $dbBatigest = Db::getInstance('batigest');
     
     $nbLignesTraitees = 0;
@@ -45,16 +44,7 @@ try {
         $codeElem = $parts[2];
         $qte = (int)$parts[3];
         
-        if ($action === 'ignore') {
-            // Insérer dans la table HistoMaj comme ignoré
-            $dbInterventions->query("INSERT INTO HistoMaj VALUES (:codeDoc, :numLig, :codeElem, :qte, 1, GETDATE())", [
-                'codeDoc' => $codeDoc,
-                'numLig' => $numLig,
-                'codeElem' => $codeElem,
-                'qte' => $qte
-            ]);
-        } 
-        else if ($action === 'update') {
+        if ($action === 'update') {
             // Vérifier le stock disponible dans Batigest
             $stockDispo = $dbBatigest->query("SELECT (QttAppro - QttConso) AS QttStock FROM ElementStock WHERE CodeElem = :codeElem", ['codeElem' => $codeElem])->fetch(PDO::FETCH_ASSOC)["QttStock"];
 
@@ -80,13 +70,6 @@ try {
                     'codeElem' => $codeElem
                 ]);
 
-                // Insérer dans la table HistoMaj comme mise à jour
-                $dbInterventions->query("INSERT INTO HistoMaj VALUES (:codeDoc, :numLig, :codeElem, :quantite, 0, GETDATE())", [
-                    'codeDoc' => $codeDoc,
-                    'numLig' => $numLig,
-                    'codeElem' => $codeElem,
-                    'quantite' => $qte
-                ]);
             }
             else {
                 $libelle = $dbBatigest->query("SELECT LibelleStd FROM ElementDef WHERE Code = :codeElem", ['codeElem' => $codeElem])->fetch(PDO::FETCH_ASSOC)["LibelleStd"];
