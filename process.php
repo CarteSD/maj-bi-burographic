@@ -12,7 +12,7 @@ require_once 'Db.php';
 session_start();
 
 // Vérifier si des lignes ont été sélectionnées
-if (!isset($_POST['ignore']) || !is_array($_POST['ignore']) || empty($_POST['ignore'])) {
+if (!isset($_POST['selected']) || !is_array($_POST['selected']) || empty($_POST['selected'])) {
     $_SESSION['success_message'] = false;
     $_SESSION['message_details'] = "Aucune ligne sélectionnée.";
     header('Location: index.php');
@@ -20,7 +20,7 @@ if (!isset($_POST['ignore']) || !is_array($_POST['ignore']) || empty($_POST['ign
 }
 
 // Vérifier quelle action a été demandée
-if (!isset($_POST['action']) || ($_POST['action'] !== 'ignore' && $_POST['action'] !== 'update')) {
+if (!isset($_POST['action']) || $_POST['action'] !== 'update') {
     $_SESSION['success_message'] = false;
     $_SESSION['message_details'] = "Action non reconnue.";
     header('Location: index.php');
@@ -28,10 +28,11 @@ if (!isset($_POST['action']) || ($_POST['action'] !== 'ignore' && $_POST['action
 }
 
 $action = $_POST['action'];
-$selectedLines = $_POST['ignore'] ?? [];
+$selectedLines = $_POST['selected'] ?? [];
+var_dump($selectedLines); // Pour débogage, à supprimer en production
+exit;
 
 try {
-    $dbInterventions = Db::getInstance('interventions');
     $dbBatigest = Db::getInstance('batigest');
     
     $nbLignesTraitees = 0;
@@ -45,16 +46,7 @@ try {
         $codeElem = $parts[2];
         $qte = (int)$parts[3];
         
-        if ($action === 'ignore') {
-            // Insérer dans la table HistoMaj comme ignoré
-            $dbInterventions->query("INSERT INTO HistoMaj VALUES (:codeDoc, :numLig, :codeElem, :qte, 1, GETDATE())", [
-                'codeDoc' => $codeDoc,
-                'numLig' => $numLig,
-                'codeElem' => $codeElem,
-                'qte' => $qte
-            ]);
-        } 
-        else if ($action === 'update') {
+        if ($action === 'update') {
             // Vérifier le stock disponible dans Batigest
             $stockDispo = $dbBatigest->query("SELECT (QttAppro - QttConso) AS QttStock FROM ElementStock WHERE CodeElem = :codeElem", ['codeElem' => $codeElem])->fetch(PDO::FETCH_ASSOC)["QttStock"];
 
@@ -80,13 +72,6 @@ try {
                     'codeElem' => $codeElem
                 ]);
 
-                // Insérer dans la table HistoMaj comme mise à jour
-                $dbInterventions->query("INSERT INTO HistoMaj VALUES (:codeDoc, :numLig, :codeElem, :quantite, 0, GETDATE())", [
-                    'codeDoc' => $codeDoc,
-                    'numLig' => $numLig,
-                    'codeElem' => $codeElem,
-                    'quantite' => $qte
-                ]);
             }
             else {
                 $libelle = $dbBatigest->query("SELECT LibelleStd FROM ElementDef WHERE Code = :codeElem", ['codeElem' => $codeElem])->fetch(PDO::FETCH_ASSOC)["LibelleStd"];
