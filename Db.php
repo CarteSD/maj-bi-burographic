@@ -57,7 +57,7 @@ class Db
     public static function getInstance(string $dbName): Db
     {
         if (self::$instance === null) {
-            self::$instance= new Db($);
+            self::$instance= new Db();
         }
         return self::$instance;
     }
