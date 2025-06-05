@@ -8,7 +8,6 @@
  * @version  0.0
  */
 
-
 require_once 'Db.php';
 
 $template = file_get_contents('index.template.html');
@@ -37,6 +36,15 @@ foreach ($toutesLesLignes as $line) {
     ];
 }
 
+$lignesGroupees = [];
+foreach ($lignesAMettreAJour as $ligne) {
+    $codeDoc = $ligne['CodeDoc'];
+    if (!isset($lignesGroupees[$codeDoc])) {
+        $lignesGroupees[$codeDoc] = [];
+    }
+    $lignesGroupees[$codeDoc][] = $ligne;
+}
+
 $html = '<form action="process.php" method="post" id="process-form">
 <table border="1" style="border-collapse: collapse; width: 100%;">
     <thead>
@@ -56,15 +64,46 @@ $template = str_replace('{{nb_bi}}', count($lignesAMettreAJour), $template);
 if (empty($lignesAMettreAJour)) {
     $html .= '<tr><td colspan="5" style="text-align: center;">Aucune intervention à mettre à jour</td></tr>';
 } else {
-    // Ajouter chaque ligne à mettre à jour
-    foreach ($lignesAMettreAJour as $line) {
-        $html .= '<tr onclick="selectCheckbox(this)">
-            <td><input type="checkbox" class="line-checkbox" name="selected[]" value="' . htmlspecialchars($line['CodeDoc'] . '|' . $line['NumLig']) . '|' . $line['CodeElem'] . '|' . $line['Qte'] . '"></td>
-            <td>' . htmlspecialchars($line['CodeDoc']) . '</td>
-            <td>' . htmlspecialchars($dbBatigest->query("SELECT LibelleStd FROM ElementDef WHERE Code = :code", ["code" => $line["CodeElem"]])->fetch()["LibelleStd"]) . '</td>
-            <td>' . htmlspecialchars($line['CodeElem']) . '</td>
-            <td>' . htmlspecialchars((int)$line['Qte']) . '</td>
-        </tr>';
+    // Parcourir chaque groupe de BI
+    foreach ($lignesGroupees as $codeDoc => $lignes) {
+        $nbLignes = count($lignes);
+        
+        // Première ligne du groupe
+        $premiereLigne = $lignes[0];
+        $html .= '<tr onclick="selectBIGroup(\'' . htmlspecialchars($codeDoc) . '\')">';
+        
+        // Case à cocher avec rowspan
+        $html .= '<td rowspan="' . $nbLignes . '" style="vertical-align: middle; text-align: center;">
+            <input type="checkbox" class="bi-checkbox" data-bi="' . htmlspecialchars($codeDoc) . '" onchange="toggleBIGroup(\'' . htmlspecialchars($codeDoc) . '\')">';
+        
+        // Ajouter les checkboxes cachées pour chaque ligne du groupe
+        foreach ($lignes as $ligne) {
+            $html .= '<input type="checkbox" class="line-checkbox hidden-checkbox" data-bi="' . htmlspecialchars($codeDoc) . '" name="selected[]" value="' . htmlspecialchars($ligne['CodeDoc'] . '|' . $ligne['NumLig'] . '|' . $ligne['CodeElem'] . '|' . $ligne['Qte']) . '" style="display: none;">';
+        }
+        
+        $html .= '</td>';
+        
+        // BI avec rowspan
+        $html .= '<td rowspan="' . $nbLignes . '" style="vertical-align: middle;">' . htmlspecialchars($codeDoc) . '</td>';
+        
+        // Détails de la première ligne
+        $libelle = $dbBatigest->query("SELECT LibelleStd FROM ElementDef WHERE Code = :code", ["code" => $premiereLigne["CodeElem"]])->fetch()["LibelleStd"];
+        $html .= '<td>' . htmlspecialchars($libelle) . '</td>';
+        $html .= '<td>' . htmlspecialchars($premiereLigne['CodeElem']) . '</td>';
+        $html .= '<td>' . htmlspecialchars((int)$premiereLigne['Qte']) . '</td>';
+        $html .= '</tr>';
+        
+        // Lignes suivantes du groupe (sans les colonnes avec rowspan)
+        for ($i = 1; $i < $nbLignes; $i++) {
+            $ligne = $lignes[$i];
+            $html .= '<tr onclick="selectBIGroup(\'' . htmlspecialchars($codeDoc) . '\')">';
+            
+            $libelle = $dbBatigest->query("SELECT LibelleStd FROM ElementDef WHERE Code = :code", ["code" => $ligne["CodeElem"]])->fetch()["LibelleStd"];
+            $html .= '<td>' . htmlspecialchars($libelle) . '</td>';
+            $html .= '<td>' . htmlspecialchars($ligne['CodeElem']) . '</td>';
+            $html .= '<td>' . htmlspecialchars((int)$ligne['Qte']) . '</td>';
+            $html .= '</tr>';
+        }
     }
 }
 

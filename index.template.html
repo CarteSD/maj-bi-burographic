@@ -36,8 +36,6 @@
             background-color: var(--blanc);
             color: var(--noir);
             line-height: 1.6;
-            padding: 0;
-            margin: 0;
         }
 
         .header {
@@ -51,33 +49,6 @@
 
         .logo {
             height: 50px;
-        }
-
-        .contact-info {
-            display: flex;
-            align-items: center;
-        }
-
-        .phone {
-            color: var(--noir);
-            font-weight: 600;
-            margin-left: 15px;
-        }
-
-        .assistance-btn {
-            background-color: var(--bleu);
-            color: var(--blanc);
-            padding: 8px 15px;
-            border-radius: 20px;
-            text-decoration: none;
-            margin-right: 15px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-        }
-
-        .assistance-btn svg {
-            margin-left: 8px;
         }
 
         .container {
@@ -96,15 +67,8 @@
         h1 {
             font-family: 'Francy', sans-serif;
             color: var(--noir);
-            position: relative;
             font-weight: 300;
             margin: 0;
-        }
-
-        .subtitle {
-            color: var(--bleu);
-            font-size: 1.1rem;
-            margin-bottom: 30px;
         }
 
         .card {
@@ -151,15 +115,7 @@
         }
 
         tr:hover {
-            background-color: rgba(50, 183, 188, 0.05);
             cursor: pointer;
-        }
-
-        .empty-message {
-            text-align: center;
-            padding: 40px;
-            color: var(--rose);
-            font-weight: 500;
         }
 
         .alert {
@@ -181,23 +137,7 @@
             color: var(--rose);
         }
 
-        .footer {
-            background-color: var(--gris);
-            padding: 20px 40px;
-            text-align: center;
-            font-size: 0.9rem;
-            color: var(--noir);
-            margin-top: 40px;
-        }
-
-        .gradient-decorator {
-            height: 8px;
-            background: linear-gradient(to right, var(--rose), var(--orange), var(--bleu));
-        }
-
-        .ignore-btn {
-            background-color: var(--rose);
-            color: var(--blanc);
+        .select-all-btn, .update-selected-btn {
             border: none;
             padding: 10px 20px;
             border-radius: 50px;
@@ -207,134 +147,45 @@
             cursor: pointer;
             display: flex;
             align-items: center;
-            transition: background-color 0.3s ease;
-        }
-
-        .ignore-btn:hover {
-            background-color: #c9006e;
-            scale: 105%;
-            transition: all;
-            transition-duration: 0.2s;
-        }
-
-        .ignore-btn svg {
-            margin-right: 8px;
+            transition: all 0.2s ease;
         }
 
         .select-all-btn {
             background-color: var(--bleu);
             color: var(--blanc);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-family: 'Urbanist', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: background-color 0.3s ease;
         }
 
         .select-all-btn:hover {
             background-color: #29989c;
-            scale: 105%;
-            transition: all;
-            transition-duration: 0.2s;
+            transform: scale(1.05);
         }
 
-        .select-all-btn svg {
-            margin-right: 8px;
-        }
-
-        .select-all-btn:disabled, 
-        .ignore-btn:disabled {
-            background-color: #cccccc !important;
-            color: #666666 !important;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .select-all-btn:disabled:hover, 
-        .ignore-btn:disabled:hover {
-            scale: 100%;
-            background-color: #cccccc !important;
-        }
-
-        .log-btn {
-            background-color: var(--gris);
-            color: var(--noir);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-family: 'Urbanist', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-            width: fit-content;
-        }
-
-        .log-btn:hover {
-            scale: 105%;
-            background-color: #d0d0d0;
-            transition: all;
-            transition-duration: 0.2s;
-        }
-
-        .log-btn svg {
+        .select-all-btn svg, .update-selected-btn svg {
             margin-right: 8px;
         }
 
         .update-selected-btn {
             background-color: var(--orange);
             color: var(--blanc);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-family: 'Urbanist', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: background-color 0.3s ease;
         }
 
         .update-selected-btn:hover {
             background-color: #e08600;
-            scale: 105%;
-            transition: all;
-            transition-duration: 0.2s;
+            transform: scale(1.05);
         }
 
-        .update-selected-btn svg {
-            margin-right: 8px;
-        }
-
-        .update-selected-btn:disabled {
+        .select-all-btn:disabled, .update-selected-btn:disabled {
             background-color: #cccccc !important;
             color: #666666 !important;
             cursor: not-allowed;
             opacity: 0.7;
-        }
-
-        .update-selected-btn:disabled:hover {
-            scale: 100%;
-            background-color: #cccccc !important;
+            transform: scale(1) !important;
         }
 
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
                 padding: 15px;
-            }
-
-            .contact-info {
-                margin-top: 15px;
             }
 
             .container {
@@ -376,34 +227,52 @@
         </div>
     </div>
 </main>
-</body>
-</html>
 
 <script>
     function selectAllLines() {
-        const checkboxes = document.querySelectorAll('.line-checkbox');
-
+        const biCheckboxes = document.querySelectorAll('.bi-checkbox');
+        
         let allChecked = true;
-        checkboxes.forEach(checkbox => {
+        biCheckboxes.forEach(checkbox => {
             if (!checkbox.checked) {
                 allChecked = false;
             }
         });
-
-        checkboxes.forEach(checkbox => {
+        
+        biCheckboxes.forEach(checkbox => {
             checkbox.checked = !allChecked;
+            toggleBIGroup(checkbox.dataset.bi);
         });
+        
         updateButtonsState();
     }
-    
+
+    function selectBIGroup(biCode) {
+        const biCheckbox = document.querySelector('.bi-checkbox[data-bi="' + biCode + '"]');
+        if (biCheckbox) {
+            biCheckbox.checked = !biCheckbox.checked;
+            toggleBIGroup(biCode);
+            updateButtonsState();
+        }
+    }
+
+    function toggleBIGroup(biCode) {
+        const biCheckbox = document.querySelector('.bi-checkbox[data-bi="' + biCode + '"]');
+        const hiddenCheckboxes = document.querySelectorAll('.hidden-checkbox[data-bi="' + biCode + '"]');
+        
+        hiddenCheckboxes.forEach(checkbox => {
+            checkbox.checked = biCheckbox.checked;
+        });
+    }
+
     function updateButtonsState() {
-        const checkboxes = document.querySelectorAll('.line-checkbox');
+        const hiddenCheckboxes = document.querySelectorAll('.hidden-checkbox');
         const updateSelectedButton = document.querySelector('.update-selected-btn');
         
         if (!updateSelectedButton) return;
         
         let atLeastOneChecked = false;
-        checkboxes.forEach(checkbox => {
+        hiddenCheckboxes.forEach(checkbox => {
             if (checkbox.checked) {
                 atLeastOneChecked = true;
                 return;
@@ -412,7 +281,7 @@
         
         updateSelectedButton.disabled = !atLeastOneChecked;
     }
-    
+
     document.addEventListener('DOMContentLoaded', function() {
         const updateSelectedButton = document.querySelector('.update-selected-btn');
         
@@ -420,18 +289,18 @@
             updateSelectedButton.disabled = true;
         }
         
-        const checkboxes = document.querySelectorAll('.line-checkbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', updateButtonsState);
+        const biCheckboxes = document.querySelectorAll('.bi-checkbox');
+        biCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                toggleBIGroup(this.dataset.bi);
+                updateButtonsState();
+            });
+            
+            checkbox.addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
         });
     });
-
-    function selectCheckbox(row) {
-        const checkbox = row.querySelector('.line-checkbox');
-        const isCheckboxClick = event.target.type === 'checkbox';
-        if (!isCheckboxClick) {
-            checkbox.checked = !checkbox.checked;
-        }
-        updateButtonsState();
-    }
 </script>
+</body>
+</html>
