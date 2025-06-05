@@ -19,25 +19,22 @@ $toutesLesLignes = $dbBatigest->query("SELECT IntervLigne.CodeDoc, IntervLigne.N
 $lignesAMettreAJour = [];
 foreach ($toutesLesLignes as $line) {
     $key = $line['CodeDoc'].'|'.$line['NumLig'];
-    if (!isset($majExistantes[$key])) {
-        $sortieMvt = $dbBatigest->query("SELECT COUNT(*) AS nb FROM ElementMvtStock WHERE TypeMvt = 'S' AND CodeElem = :codeElem AND Quantite = :qte AND Info = :info", [
-            'codeElem' => $line['CodeElem'],
-            'qte' => $line['Qte'],
-            'info' => $line['CodeDoc']
-        ])->fetch(PDO::FETCH_ASSOC);
+    $sortieMvt = $dbBatigest->query("SELECT COUNT(*) AS nb FROM ElementMvtStock WHERE TypeMvt = 'S' AND CodeElem = :codeElem AND Quantite = :qte AND Info = :info", [
+        'codeElem' => $line['CodeElem'],
+        'qte' => $line['Qte'],
+        'info' => $line['CodeDoc']
+    ])->fetch(PDO::FETCH_ASSOC);
 
-        if ($sortieMvt['nb'] > 0) {
-            continue;
-        }
-
-        $lignesAMettreAJour[] = [
-            'CodeDoc' => $line['CodeDoc'],
-            'NumLig' => $line['NumLig'],
-            'CodeElem' => $line['CodeElem'],
-            'Qte' => $line['Qte'],
-        ];
-        
+    if ($sortieMvt['nb'] > 0) {
+        continue;
     }
+
+    $lignesAMettreAJour[] = [
+        'CodeDoc' => $line['CodeDoc'],
+        'NumLig' => $line['NumLig'],
+        'CodeElem' => $line['CodeElem'],
+        'Qte' => $line['Qte'],
+    ];
 }
 
 $html = '<form action="process.php" method="post" id="process-form">
