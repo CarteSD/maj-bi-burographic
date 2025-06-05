@@ -402,10 +402,9 @@
     
     function updateButtonsState() {
         const checkboxes = document.querySelectorAll('.line-checkbox');
-        const ignoreButton = document.querySelector('.ignore-btn');
         const updateSelectedButton = document.querySelector('.update-selected-btn');
         
-        if (!ignoreButton || !updateSelectedButton) return;
+        if (!updateSelectedButton) return;
         
         let atLeastOneChecked = false;
         checkboxes.forEach(checkbox => {
@@ -415,17 +414,11 @@
             }
         });
         
-        ignoreButton.disabled = !atLeastOneChecked;
         updateSelectedButton.disabled = !atLeastOneChecked;
     }
     
     document.addEventListener('DOMContentLoaded', function() {
-        const ignoreButton = document.querySelector('.ignore-btn');
         const updateSelectedButton = document.querySelector('.update-selected-btn');
-        
-        if (ignoreButton) {
-            ignoreButton.disabled = true;
-        }
         
         if (updateSelectedButton) {
             updateSelectedButton.disabled = true;
