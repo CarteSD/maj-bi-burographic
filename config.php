@@ -10,6 +10,6 @@
 
 // Configuration de la base de données Batigest
 define('DB_SERVER', 'DESKTOP-D5H040D\\SAGEBAT');
-define('DB_NAME', 'INTERVENTIONS');
+define('DB_NAME', 'BTG_DOS_SOC01');
 define('DB_USERNAME', null);
 define('DB_PASSWORD', null);

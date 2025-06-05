@@ -29,7 +29,7 @@ class Db
     private function __construct()
     {
         try {
-            $this->conn = new PDO("sqlsrv:Server=" . DB_SERVER . ";Database=" . DB_BATIGEST, DB_USERNAME, DB_PASSWORD);
+            $this->conn = new PDO("sqlsrv:Server=" . DB_SERVER . ";Database=" . DB_NAME, DB_USERNAME, DB_PASSWORD);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
