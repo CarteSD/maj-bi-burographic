@@ -103,7 +103,6 @@ try {
                     'QteRequis' => $ligne['qte'],
                     'QteDispo' => $stockDispo
                 ];
-                break; // Sortir de la boucle dès qu'une ligne est invalide
             }
             
             // Récupérer le prix d'achat de l'élément
@@ -114,7 +113,7 @@ try {
                     [
                         'codeElem' => $ligne['codeElem']
                     ]
-                )->fetch(PDO::FETCH_ASSOC)["PA"]
+                )->fetch(PDO::FETCH_ASSOC)["PA"];
             $pa = round($pa, 2); // Arrondir le prix d'achat à 2 décimales
 
             // Stocker les informations pour la mise à jour
@@ -182,7 +181,7 @@ try {
             foreach ($lignes as $ligne) {
                 $message .= "<strong>{$ligne['Libelle']}</strong> : " .
                            "Stock requis: {$ligne['QteRequis']}, " .
-                           "Stock disponible: {$ligne['QteDispo']}";
+                           "Stock disponible: {$ligne['QteDispo']}<br>";
             }
         }
         
