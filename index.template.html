@@ -229,6 +229,12 @@
 </main>
 
 <script>
+     /**
+     * Sélectionne ou désélectionne tous les bons d'intervention
+     * Si tous les BIs sont cochés, les décoche tous
+     * Si au moins un BI est décoché, les coche tous
+     * Met à jour l'état des checkboxes cachées et du bouton de mise à jour
+     */
     function selectAllLines() {
         const biCheckboxes = document.querySelectorAll('.bi-checkbox');
         
@@ -247,6 +253,14 @@
         updateButtonsState();
     }
 
+    /**
+     * Gère la sélection d'un bon d'intervention spécifique
+     * Inverse l'état de la checkbox du BI
+     * Met à jour les checkboxes cachées associées
+     * Met à jour l'état du bouton de mise à jour
+     * 
+     * @param {string} biCode - Le code du bon d'intervention (ex: "BI000009")
+     */
     function selectBIGroup(biCode) {
         const biCheckbox = document.querySelector('.bi-checkbox[data-bi="' + biCode + '"]');
         if (biCheckbox) {
@@ -256,6 +270,12 @@
         }
     }
 
+    /**
+     * Synchronise l'état des checkboxes cachées avec la checkbox visible d'un BI
+     * Cette fonction est appelée quand on clique sur une checkbox ou sur une ligne
+     * 
+     * @param {string} biCode - Le code du bon d'intervention à mettre à jour
+     */
     function toggleBIGroup(biCode) {
         const biCheckbox = document.querySelector('.bi-checkbox[data-bi="' + biCode + '"]');
         const hiddenCheckboxes = document.querySelectorAll('.hidden-checkbox[data-bi="' + biCode + '"]');
@@ -265,6 +285,11 @@
         });
     }
 
+    /**
+     * Met à jour l'état du bouton "Mettre à jour la sélection"
+     * Le bouton est activé si au moins une checkbox cachée est cochée
+     * Le bouton est désactivé si aucune checkbox n'est cochée
+     */
     function updateButtonsState() {
         const hiddenCheckboxes = document.querySelectorAll('.hidden-checkbox');
         const updateSelectedButton = document.querySelector('.update-selected-btn');
@@ -282,6 +307,12 @@
         updateSelectedButton.disabled = !atLeastOneChecked;
     }
 
+    /**
+     * Initialisation au chargement de la page
+     * - Désactive le bouton de mise à jour
+     * - Ajoute les écouteurs d'événements sur les checkboxes
+     * - Empêche la propagation du clic sur les checkboxes
+     */
     document.addEventListener('DOMContentLoaded', function() {
         const updateSelectedButton = document.querySelector('.update-selected-btn');
         
