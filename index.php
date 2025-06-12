@@ -95,16 +95,7 @@ if (empty($lignesAMettreAJour)) {
 } else {
     // Parcourir chaque groupe de BI
     foreach ($lignesGroupees as $codeDoc => $lignes) {
-        // Filtrer les lignes pour ne garder que celles avec un CodeElem non vide, permet d'éviter les lignes vides qui peuvent poser problème
-        $lignesGroupees[$codeDoc] = array_filter($lignes, function($ligne) {
-            return !empty($ligne['CodeElem']);
-        });
-
         $nbLignes = count($lignes);
-
-        if ($nbLignes === 0) {
-            continue; // Si le groupe est vide, on passe au suivant
-        }
         
         // Première ligne du groupe différente des autres car elle contient les checkboxes
         $premiereLigne = $lignes[0];
